@@ -85,7 +85,10 @@ def printFromBackToFront(uid,frontId,backId,filename):#打印
 		
 					elif i['desc']['type'] == 2:#图文
 						tmp = json.loads(i['card'])
-						fo.write("<p>"+'图文:\n'+tmp['item']['description']+"</p>")
+						fo.write("<p>"+'图文:\n'+tmp['item']['description']+"</p><br><div>")
+						for j in tmp['item']['pictures']:
+							fo.write("<img src=\""+j['img_src']+"@100w_100h_1e_1c.webp\" width=\"100px\" height=\"100px\"/>")
+						fo.write("</div><br>")
 						print('图文:\n'+tmp['item']['description'])
 					elif i['desc']['type'] == 4:#正文
 						tmp = json.loads(i['card'])
