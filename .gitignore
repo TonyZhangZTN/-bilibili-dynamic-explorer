@@ -6,7 +6,9 @@ bin-release/
 
 # Other files and folders
 .settings/
-
+/dist/
+/build/
+/__pycache__/
 # Executables
 *.swf
 *.air
