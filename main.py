@@ -9,11 +9,14 @@ import pymysql
 import time, datetime
 import tkinter
 def quickGet(url,params):
+	headers = {
+	"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"
+	}
 	try:
 		s = requests.Session()
 		s.mount('http://',HTTPAdapter(max_retries=100))#设置重试次数为10次
 		s.mount('https://',HTTPAdapter(max_retries=100))
-		buffer = s.get(url,params=params,timeout=1)
+		buffer = s.get(url,params=params,timeout=1, headers = headers)
 	except requests.exceptions.ConnectionError as e:
 		print("连接超时")
 	buffer.encoding="utf-8"
@@ -172,12 +175,15 @@ def findBackId(uid,backtime,l,r):
 def main():
 	uid = input("uid:")
 	data = json.loads(quickGet("https://api.bilibili.com/x/space/acc/info",{'mid':uid,'jsonp':'jsonp'}))
+	print(data)
 	filename = data['data']['name']+".html"
-	timestr = input("begin: YYYY-MM-DD HH:MM:SS\n")
-	fronttime = int(time.mktime(time.strptime(timestr, "%Y-%m-%d %H:%M:%S")))
-	timestr = input("till when?: YYYY-MM-DD HH:MM:SS\n")
-	backtime = int(time.mktime(time.strptime(timestr, "%Y-%m-%d %H:%M:%S")))
-
+	print("user:"+data['data']['name'])
+	operation = input("mode\n1:all\t2:range")
+	if(operation == "2"):
+		timestr = input("begin: YYYY-MM-DD HH:MM:SS\n")
+		fronttime = int(time.mktime(time.strptime(timestr, "%Y-%m-%d %H:%M:%S")))
+		timestr = input("till when?: YYYY-MM-DD HH:MM:SS\n")
+		backtime = int(time.mktime(time.strptime(timestr, "%Y-%m-%d %H:%M:%S")))
 	topId = getTopId(uid)
 	bottomId = 1
 	if topId == -1:#l
@@ -185,10 +191,14 @@ def main():
 		exit()
 	else:
 		bottomId = findBottomId(uid,topId)
-		print('第一个动态id:'+str(bottomId))
-	frontId = findFrontId(uid,fronttime,bottomId,topId)
-	backId = findBackId(uid,backtime,bottomId,topId)
-	print("范围内最早id%d，最晚id%d"%(frontId,backId))
+		#print('第一个动态id:'+str(bottomId))
+	if(operation == "1"):
+		frontId = bottomId
+		backId = topId
+	elif(operation == "2"):
+		frontId = findFrontId(uid,fronttime,bottomId,topId)
+		backId = findBackId(uid,backtime,bottomId,topId)
+		#print("范围内最早id%d，最晚id%d"%(frontId,backId))
 	printFromBackToFront(uid,frontId,backId,filename)
 if __name__ == '__main__':
 	main()
