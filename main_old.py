@@ -8,7 +8,9 @@ import difflib
 import pymysql
 import time, datetime
 import random
-APIURL = "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space"
+oldAPIURL = "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history"
+newAPIURL = "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space"
+APIURL = oldAPIURL
 debug = False
 def quickGet(url,params):
 	headers = {
@@ -27,23 +29,26 @@ def quickGet(url,params):
 	return buffer.text
 #获取一列动态中的最大动态id和时间戳，只用于查找动态id范围用
 def findMaxIdAndTime(uid,did):
-	arg={'host_mid':uid,'offset':did+1,'timezone_offset':-480}
+	#arg={'host_mid':uid,'offset':did+1,'timezone_offset':-480}
+	arg={'host_uid':uid,'offset_dynamic_id':did+1}
 	js = json.loads(quickGet(APIURL,arg))
-	if 'items' in js['data'] and len(js['data']['items']) > 0:
-		return int(js['data']['items'][0]['id_str']),js['data']['items'][0]['modules']['module_author']['pub_ts']
+	if 'cards' in js['data']:
+		return js['data']['cards'][0]['desc']['dynamic_id'],js['data']['cards'][0]['desc']['timestamp']
 	else:
 		return -1,-1
 #获取顶层动态ID
 def getTopId(uid):
-	arg={'host_mid':uid,'timezone_offset':-480}
+	#arg={'host_mid':uid,'timezone_offset':-480}
+	arg={'host_uid':uid}
 	js = json.loads(quickGet(APIURL,arg))
-	if 'items' in js['data'] and len(js['data']['items']) > 0:
-		return int(js['data']['items'][0]['id_str'])
+	if 'cards' in js['data']:
+		return js['data']['cards'][0]['desc']['dynamic_id']
 	else:
 		return -1
 def printFromBackToFront(uid,frontId,backId,filename):#打印并保存
 	#-480  是GMT+8的意思
-	arg = {'host_mid':uid,'offset':backId+1,'timezone_offset':-480}#之所以+1是因为直接请求这个动态id的返回数据不包含此动态id的内容
+	#arg = {'host_mid':uid,'offset':backId+1,'timezone_offset':-480}#之所以+1是因为直接请求这个动态id的返回数据不包含此动态id的内容
+	arg = {'host_uid':uid,'offset_dynamic_id':backId+1}#之所以+1是因为直接请求这个动态id的返回数据不包含此动态id的内容
 	cnt = 0
 	flag = True
 	with open(filename,'w',encoding='utf-8') as fo:
@@ -53,7 +58,7 @@ def printFromBackToFront(uid,frontId,backId,filename):#打印并保存
 			time.sleep(sleepTime)
 			data = json.loads(quickGet(APIURL,arg))
 			print(data)
-			print(" sleepTime:" + str(sleepTime))
+			print("sleepTime:" + str(sleepTime))
 			if 'cards' in data['data']:
 				for i in data['data']['cards']:
 					if i['desc']['dynamic_id']<frontId:
@@ -135,7 +140,7 @@ def findBottomId(uid,end):
 		mid,mt = findMaxIdAndTime(uid,m)#如果无就是-1
 		#*mid<=m，有m不一定存在mid,不能直接从找到的mid缩小范围，否则可能漏*
 		print("findBottomId")
-		print('depth'+str(cnt) +" sleepTime:" + str(sleepTime))
+		print('depth'+str(cnt) +"sleepTime:" + str(sleepTime))
 		print("l=%d\nr=%d\nm=%d"%(l,r,m))
 		print("mid="+str(mid)+'\n\n')
 		if mid>0 :
@@ -160,7 +165,7 @@ def findFrontId(uid,fronttime,l,r):
 		cnt = cnt + 1
 		mid,mt = findMaxIdAndTime(uid,m)
 		print("findFrontId")
-		print('depth'+str(cnt)+" sleepTime:" + str(sleepTime))
+		print('depth'+str(cnt)+"sleepTime:" + str(sleepTime))
 		print("l=%d\nr=%d\nm=%d"%(l,r,m))
 		print("mid="+str(mid))
 		if mt > 0:
@@ -184,7 +189,7 @@ def findBackId(uid,backtime,l,r):
 		cnt = cnt + 1
 		mid,mt = findMaxIdAndTime(uid,m)
 		print("findBackId")
-		print('depth'+str(cnt)+" sleepTime:" + str(sleepTime))
+		print('depth'+str(cnt)+"sleepTime:" + str(sleepTime))
 		print("l=%d\nr=%d\nm=%d"%(l,r,m))
 		print("mid="+str(mid))
 		if mt > 0:
