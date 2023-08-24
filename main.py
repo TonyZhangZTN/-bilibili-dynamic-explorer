@@ -68,9 +68,6 @@ def printFromBackToFront(uid,frontId,backId,filename):
 			#print(" sleepTime:" + str(sleepTime))
 			if 'items' in data['data']:
 				for i in data['data']['items']:
-					if int(i['id_str'])<frontId:
-						flag = False
-						break
 					print(json.dumps(i))
 					cnt += 1
 					fo.write("<hr><p>"+'倒数第'+str(cnt)+'条动态'+"</p>")
@@ -111,9 +108,14 @@ def printFromBackToFront(uid,frontId,backId,filename):
 										fo.write("<p>"+orig_dynamic['desc']["text"]+"<br></p>")
 										print(orig_dynamic['desc']["text"])
 							# traverse each image
-							for j in orig_major['draw']["items"]:
-								fo.write("<img src=\""+j['src']+"@100w_100h_1e_1c.webp\" width=\"100px\" height=\"100px\"/>")
-							fo.write("<p><br>")
+							
+							if (orig_major["type"] == "MAJOR_TYPE_NONE"):
+								fo.write("<p>该图文已被删除</p>")
+								print("该图文已被删除")
+							elif(orig_major["type"] == "MAJOR_TYPE_DRAW"):
+								for j in orig_major['draw']["items"]:
+									fo.write("<img src=\""+j['src']+"@100w_100h_1e_1c.webp\" width=\"100px\" height=\"100px\"/>")
+								fo.write("<p><br>")
 						elif i["orig"]["type"] == "DYNAMIC_TYPE_WORD":
 							#正文
 							fo.write('正文:\n'+orig_dynamic['desc']['text'])
@@ -184,8 +186,13 @@ def printFromBackToFront(uid,frontId,backId,filename):
 						print("Unhandled type:%s"%(i['type']))
 						fo.write("<p>"+"Unhandled type:%s"%(i['type'])+"</p>")
 					print("\n\n")
+					
+					if int(i['id_str'])<=frontId:
+						print("Fetching and printing done, exiting the program")
+						flag = False
+						break
 			else:
-				print("Fetching and printing done, exiting the program")
+				print("Error in response: no items")
 				break
 		fo.write("</body>\n</html>\n")
 		fo.close()
@@ -289,11 +296,12 @@ def main():
 		print("此人无动态")
 		exit()
 	else:
-		bottomId = findBottomId(uid,topId)
+		#bottomId = findBottomId(uid,topId)
+		pass
 		#print('第一个动态id:'+str(bottomId))
 	if(operation == "1"):
-		frontId = bottomId
-		backId = topId
+		frontId = 4915139101108543
+		backId = 163515860295773425
 	elif(operation == "2"):
 		frontId = findFrontId(uid,fronttime,bottomId,topId)
 		backId = findBackId(uid,backtime,bottomId,topId)
