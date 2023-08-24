@@ -116,9 +116,16 @@ def printFromBackToFront(uid,frontId,backId,filename):
 							print('正文:\n'+orig_dynamic['desc']['text'])
 						elif i["orig"]["type"] == "DYNAMIC_TYPE_AV":
 							#视频
-							orig_archive = orig_major["archive"]
-							fo.write('视频:\n'+orig_archive['title']+'<br>描述:\n'+orig_archive['desc'])
-							print('视频:\n'+orig_archive['title']+'描述:\n'+orig_archive['desc'])
+							if (orig_major["type"] == "MAJOR_TYPE_NONE"):
+								fo.write("<p>该视频已被删除</p>")
+								print("该视频已被删除")
+							elif (orig_major["type"] == "MAJOR_TYPE_ARCHIVE"):
+								orig_archive = orig_major["archive"]
+								fo.write('视频:\n'+orig_archive['title']+'<br>描述:\n'+orig_archive['desc'])
+								print('视频:\n'+orig_archive['title']+'描述:\n'+orig_archive['desc'])
+							else:
+								fo.write("<p> unknown video source, not in archive mode</p>")
+								print("unknown video source, not in archive mode")
 						elif i["orig"]["type"] == "DYNAMIC_TYPE_ARTICLE":
 							#专栏
 							if (orig_major["type"] == "MAJOR_TYPE_ARTICLE"):
