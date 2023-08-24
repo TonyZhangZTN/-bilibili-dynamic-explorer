@@ -104,8 +104,10 @@ def printFromBackToFront(uid,frontId,backId,filename):
 						fo.write("<p>"+'原作者:'+orig_author+"</p>")
 						if i["orig"]["type"] == "DYNAMIC_TYPE_DRAW":
 							#图文
-							fo.write("<p>"+orig_dynamic['desc']["text"]+"<br></p>")
-							print(orig_dynamic['desc']["text"])
+							if("text" in orig_dynamic['desc']):
+								if (orig_dynamic['desc']["text"] != None):
+									fo.write("<p>"+orig_dynamic['desc']["text"]+"<br></p>")
+									print(orig_dynamic['desc']["text"])
 							# traverse each image
 							for j in orig_major['draw']["items"]:
 								fo.write("<img src=\""+j['src']+"@100w_100h_1e_1c.webp\" width=\"100px\" height=\"100px\"/>")
