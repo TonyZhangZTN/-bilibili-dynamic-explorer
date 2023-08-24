@@ -26,9 +26,10 @@ def quickGet(url,params):
 		s.mount('http://',HTTPAdapter(max_retries=100))#设置重试次数为10次
 		s.mount('https://',HTTPAdapter(max_retries=100))
 		buffer = s.get(url,params=params,timeout=1, headers = headers,cookies=cookies)
+		buffer.encoding="utf-8"
 	except requests.exceptions.ConnectionError as e:
 		print("连接超时")
-	buffer.encoding="utf-8"
+		return None
 	if debug == True:
 		print(buffer.text)
 	return buffer.text
@@ -47,7 +48,12 @@ def getTopId(uid):
 	#print(text)
 	js = json.loads(text)
 	if 'items' in js['data'] and len(js['data']['items']) > 0:
-		return int(js['data']['items'][0]['id_str'])
+		id_0 = int(js['data']['items'][0]['id_str'])
+		if len(js['data']['items']) == 1:
+			return id_0
+		else:
+			id_1 = int(js['data']['items'][1]['id_str'])
+			return max(id_0,id_1)
 	else:
 		return -1
 
