@@ -68,14 +68,14 @@ def printFromBackToFront(uid,frontId,backId,filename):
 		# write header to the archive html file
 		fo.write("<html><head><title>"+filename+"</title><meta charset=\"UTF-8\"><head/><body>")
 		while flag == True:
-			sleepTime = 0.45 + random.random()/10
+			sleepTime = 0.8 + random.random()/10
 			time.sleep(sleepTime)
 			data = json.loads(quickGet(APIURL,arg))
 			#print(data)
 			#print(" sleepTime:" + str(sleepTime))
 			if 'items' in data['data']:
 				for i in data['data']['items']:
-					print(json.dumps(i))
+					#print(json.dumps(i))
 					cnt += 1
 					fo.write("<hr><p>"+'倒数第'+str(cnt)+'条动态'+"</p>")
 					print('倒数第'+str(cnt)+'条动态')
@@ -210,7 +210,7 @@ def findBottomId(uid,end):
 	r = end # 传入topId，最大id
 	bottomId = -1 #默认id为-1，即异常
 	while l<=r:
-		sleepTime = 0.45 + random.random()/10
+		sleepTime = 0.8 + random.random()/10
 		time.sleep(sleepTime)
 		m = (l+r)//2
 		cnt = cnt + 1
@@ -236,7 +236,7 @@ def findFrontId(uid,fronttime,l,r):
 	cnt = 0
 	frontId = l
 	while l<=r:
-		sleepTime = 0.45 + random.random()/10
+		sleepTime = 0.8 + random.random()/10
 		time.sleep(sleepTime)
 		m = (l+r)//2
 		cnt = cnt + 1
@@ -260,7 +260,7 @@ def findBackId(uid,backtime,l,r):
 	cnt = 0
 	backId = r
 	while l<=r:
-		sleepTime = 0.45 + random.random()/10
+		sleepTime = 0.8 + random.random()/10
 		time.sleep(sleepTime)
 		m = (l+r)//2
 		cnt = cnt + 1
