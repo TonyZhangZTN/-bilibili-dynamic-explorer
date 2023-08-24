@@ -1,3 +1,4 @@
+# coding: utf8
 import os
 import requests
 import json
@@ -59,7 +60,7 @@ def printFromBackToFront(uid,frontId,backId,filename):
 	flag = True
 	with open(filename,'w',encoding='utf-8') as fo:
 		# write header to the archive html file
-		fo.write("<html><head><title>"+filename+"</title><head/><body>")
+		fo.write("<html><head><title>"+filename+"</title><meta charset=\"UTF-8\"><head/><body>")
 		while flag == True:
 			sleepTime = 0.45 + random.random()/10
 			time.sleep(sleepTime)
@@ -273,11 +274,9 @@ def findBackId(uid,backtime,l,r):
 			l = m + 1
 	return backId
 def main():
-	#uid = input("uid:")
-	uid = "12246"
+	uid = input("uid:")
 	global buvid3
-	# buvid3 = input("Please input buvid3 token:").strip()
-	buvid3 = "D16402AB-DA6F-15D3-01FC-C84871726F9211419infoc"
+	buvid3 = input("Please input buvid3 token:").strip()
 	text = quickGet("https://api.bilibili.com/x/space/wbi/acc/info",{'platform':'web','mid':uid,'jsonp':'jsonp'})
 	print(text)
 	data = json.loads(text)
@@ -296,12 +295,12 @@ def main():
 		print("此人无动态")
 		exit()
 	else:
-		#bottomId = findBottomId(uid,topId)
+		bottomId = findBottomId(uid,topId)
 		pass
-		#print('第一个动态id:'+str(bottomId))
+		print('第一个动态id:'+str(bottomId))
 	if(operation == "1"):
-		frontId = 4915139101108543
-		backId = 163515860295773425
+		frontId = bottomId
+		backId = topId
 	elif(operation == "2"):
 		frontId = findFrontId(uid,fronttime,bottomId,topId)
 		backId = findBackId(uid,backtime,bottomId,topId)
