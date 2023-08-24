@@ -89,14 +89,15 @@ def printFromBackToFront(uid,frontId,backId,filename):
 					# FORWARD
 					if i['type'] == "DYNAMIC_TYPE_FORWARD":
 						name = modules["module_author"]["name"]
-						forwarded_message =modules["module_dynamic"]["desc"]["text"]
 						orig_modules = i["orig"]["modules"]
 						orig_author = orig_modules["module_author"]["name"]
 						orig_dynamic = orig_modules["module_dynamic"]
 						orig_major = orig_dynamic["major"]
 						print('用户:'+name)
-						fo.write("<p>"+'转发内容:\n'+forwarded_message+"</p>)")
-						print('转发内容:\n'+forwarded_message)
+						if("text" in modules["module_dynamic"]["desc"]):
+							forwarded_message = modules["module_dynamic"]["desc"]["text"]
+							fo.write("<p>"+'转发内容:\n'+forwarded_message+"</p>)")
+							print('转发内容:\n'+forwarded_message)
 
 						# begin a div to contain the forwarded content
 						fo.write("<div style=\"background-color:rgb(128,128,128);\">")
@@ -104,10 +105,11 @@ def printFromBackToFront(uid,frontId,backId,filename):
 						fo.write("<p>"+'原作者:'+orig_author+"</p>")
 						if i["orig"]["type"] == "DYNAMIC_TYPE_DRAW":
 							#图文
-							if("text" in orig_dynamic['desc']):
-								if (orig_dynamic['desc']["text"] != None):
-									fo.write("<p>"+orig_dynamic['desc']["text"]+"<br></p>")
-									print(orig_dynamic['desc']["text"])
+							if(orig_dynamic['desc'] != None):
+								if("text" in orig_dynamic['desc']):
+									if (orig_dynamic['desc']["text"] != None):
+										fo.write("<p>"+orig_dynamic['desc']["text"]+"<br></p>")
+										print(orig_dynamic['desc']["text"])
 							# traverse each image
 							for j in orig_major['draw']["items"]:
 								fo.write("<img src=\""+j['src']+"@100w_100h_1e_1c.webp\" width=\"100px\" height=\"100px\"/>")
