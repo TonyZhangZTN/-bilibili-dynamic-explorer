@@ -36,17 +36,28 @@ def quickGet(url,params):
 #获取一列动态中的最大动态id和时间戳，只用于查找动态id范围用
 def findMaxIdAndTime(uid,did):
 	arg={'host_mid':uid,'offset':did+1,'timezone_offset':-480}
-	js = json.loads(quickGet(APIURL,arg))
+	while True:
+		# to prevent getting {"code":4101129,"message":"加载错误，请稍后 再试","ttl":1}
+		text = quickGet(APIURL,arg)
+		js = json.loads(text)
+		if "data" in js:
+			break
+		else:
+			print("error in response:%s"%(text))
 	if 'items' in js['data'] and len(js['data']['items']) > 0:
 		return int(js['data']['items'][0]['id_str']),js['data']['items'][0]['modules']['module_author']['pub_ts']
 	else:
 		return -1,-1
 #获取顶层动态ID
-def getTopId(uid):
+def getTopId(uid):	
 	arg={'host_mid':uid,'timezone_offset':-480,"features":"itemOpusStyle,listOnlyfans"}
-	text = quickGet(APIURL,arg)
-	#print(text)
-	js = json.loads(text)
+	while True:
+		text = quickGet(APIURL,arg)
+		js = json.loads(text)
+		if "data" in js:
+			break
+		else:
+			print("error in response:%s"%(text))
 	if 'items' in js['data'] and len(js['data']['items']) > 0:
 		id_0 = int(js['data']['items'][0]['id_str'])
 		if len(js['data']['items']) == 1:
@@ -70,7 +81,13 @@ def printFromBackToFront(uid,frontId,backId,filename):
 		while flag == True:
 			sleepTime = 0.8 + random.random()/10
 			time.sleep(sleepTime)
-			data = json.loads(quickGet(APIURL,arg))
+			while True:
+				text = quickGet(APIURL,arg)
+				data = json.loads(text)
+				if "data" in data:
+					break
+				else:
+					print("error in response:%s"%(text))
 			#print(data)
 			#print(" sleepTime:" + str(sleepTime))
 			if 'items' in data['data']:
@@ -100,7 +117,7 @@ def printFromBackToFront(uid,frontId,backId,filename):
 						print('用户:'+name)
 						if("text" in modules["module_dynamic"]["desc"]):
 							forwarded_message = modules["module_dynamic"]["desc"]["text"]
-							fo.write("<p>"+'转发内容:\n'+forwarded_message+"</p>)")
+							fo.write("<p>"+'转发内容:\n'+forwarded_message+"</p>")
 							print('转发内容:\n'+forwarded_message)
 
 						# begin a div to contain the forwarded content
@@ -121,7 +138,7 @@ def printFromBackToFront(uid,frontId,backId,filename):
 								print("该图文已被删除")
 							elif(orig_major["type"] == "MAJOR_TYPE_DRAW"):
 								for j in orig_major['draw']["items"]:
-									fo.write("<img src=\""+j['src']+"@100w_100h_1e_1c.webp\" width=\"100px\" height=\"100px\"/>")
+									fo.write("<img src=\""+j['src']+"@400w_400h_1e_1c.webp\" width=\"400px\" height=\"400px\"/>")
 								fo.write("<p><br>")
 						elif i["orig"]["type"] == "DYNAMIC_TYPE_WORD":
 							#正文
@@ -161,7 +178,7 @@ def printFromBackToFront(uid,frontId,backId,filename):
 						#图文
 						fo.write("<p>"+'图文:\n'+dynamic['desc']['text']+"</p><br><div>")
 						for j in major['draw']["items"]:
-							fo.write("<img src=\""+j['src']+"@100w_100h_1e_1c.webp\" width=\"100px\" height=\"100px\"/>")
+							fo.write("<img src=\""+j['src']+"@400w_400h_1e_1c.webp\" width=\"400px\" height=\"400px\"/>")
 						fo.write("</div><br>")
 						print('图文:\n'+modules["module_dynamic"]['desc']['text'])
 					elif i['type'] == "DYNAMIC_TYPE_WORD":
